@@ -4,40 +4,27 @@
 > into your testing workflow — chat, attach requests, get analysis, all on your machine.
 > Nothing leaves your laptop.
 
-BurpMind is built for the security tester who wants the productivity of an AI copilot
-without sending production traffic, session tokens, or client data to a cloud provider.
-You run an LLM locally with Ollama; BurpMind handles the rest — context capture,
-streaming chat, markdown rendering, request attachments, and persistence.
-
 ## Features
 
 - **Local-first chat.** Streaming chat with any Ollama model (`llama3.1`, `qwen2.5`,
   `deepseek-r1`, `mistral`, etc.). Tokens render live as they arrive.
-- **Live thinking display.** When a reasoning model emits internal thoughts
-  (`think: true`), BurpMind shows them in a collapsible panel so you can see *why*
-  it's saying what it's saying, then auto-collapses when the real answer starts.
-- **Request attachments.** Right-click any request in Repeater / Proxy / HTTP history /
-  Intruder / Logger → **Add to BurpMind chat**. The request appears as a numbered,
-  collapsible bubble that the model can reference as `[1]`, `[2]`, etc.
+- **Live thinking display.** When a reasoning model emits internal thoughts,
+  BurpMind shows them in a collapsible panel and auto-collapses when the answer
+  begins streaming.
+- **Request attachments.** Right-click any request in Repeater / Proxy /
+  HTTP history / Intruder / Logger → **Add to BurpMind chat**. The request appears
+  as a numbered, collapsible bubble that the model can reference as `[1]`, `[2]`, etc.
 - **Pinned context.** Mark items as persistent context so they're sent on every turn —
-  useful for app overviews, auth flows, or "remember this is the admin endpoint".
+  useful for app overviews, auth flows, or remembering "this is the admin endpoint".
 - **Markdown done right.** GFM tables, fenced code blocks, task lists, autolinks,
-  strikethrough. Renders cleanly inside Burp's native look-and-feel, in both light
-  and dark themes.
+  strikethrough. Renders cleanly inside Burp's native look-and-feel, in light and
+  dark themes.
 - **Multi-thread sidebar.** Create, rename, and delete threads. Each thread keeps its
   own pinned context and history.
 - **Append-only persistence.** JSONL files under `~/.burpmind/`, schema-versioned for
   forward compatibility.
 - **Theme-aware UI.** Adapts to Burp's active Look-and-Feel. No global L&F overrides,
   no breaking Repeater, no surprise color shifts.
-
-## Why this exists
-
-The available Burp + LLM extensions either ship session tokens to cloud APIs, lock
-you into a single provider, or have UIs that get in your way. BurpMind is small,
-local, and built to grow — the architecture (five modules, dependency rule: domain
-← app ← infra/ui ← adapter) makes it cheap to add new providers, tools, or context
-sources without touching the chat surface.
 
 ## Module layout
 
@@ -51,7 +38,7 @@ adapter-burp/    Montoya entry point + Burp request source + context menu (the O
 ```
 
 Dependencies point strictly inward. Only `adapter-burp` links against the Montoya
-API, so the core can later be reused for other tools (Caido port, CLI, etc.).
+API, so the core can later be reused for other tools.
 
 ## Requirements
 
@@ -94,8 +81,7 @@ Pre-built JARs are also attached to every GitHub Actions run — check the
 2. In **BurpMind → Settings**: click **Test connection**, then **Refresh models**,
    then pick a default model from the dropdown.
 3. Switch to the **Chat** tab and click **+ New thread**.
-4. Right-click any request → **Add to BurpMind chat** (or use the submenu for
-   pinning / both).
+4. Right-click any request → **Add to BurpMind chat**.
 5. Ask a question. Press **Ctrl/Cmd + Enter** to send.
 
 ## On-disk layout
@@ -110,38 +96,12 @@ Pre-built JARs are also attached to every GitHub Actions run — check the
     └── pinned.json           current pinned context items
 ```
 
-Append-only writes make crash recovery trivial and keep the door open for a
-future "time-travel / branch this conversation" feature. Every record carries a
+Append-only writes make crash recovery trivial. Every record carries a
 `schemaVersion` so migrations stay clean.
 
-## Roadmap
+## Status
 
-Implemented (v0.1):
-
-- Phase 1 — Foundation skeleton
-- Phase 2 — MVP chat with streaming, threads, pinned context
-- Phase 2.5 — Inline request attachments with `[N]` references
-- Live thinking display + sticky-scroll throttled streaming
-- GFM markdown (tables, task lists, autolinks, strikethrough)
-
-Next up:
-
-- Phase 3 — `/checklist` as a structured Artifact with checkboxes
-- Phase 4 — `/payloads` and **Send to Repeater / Intruder** from within the chat
-- Phase 5 — Slash commands + prompt library
-- Phase 6 — Redaction layer with privacy preview before send
-- Phase 7 — Local RAG (PortSwigger Academy, OWASP Testing Guide, your own notes)
-- Phase 8 — Extra providers (LM Studio, OpenAI-compatible, vLLM)
-- Phase 9 — Tool use / function calling for guided multi-step flows
-
-## Contributing
-
-This is an early-stage project; the architecture is the contribution-friendly part.
-If you want to add a new LLM provider, context source, tool, or output renderer,
-the existing `Registry<K, V>` slots in `core-infra` are where everything plugs in —
-no chat-surface changes required.
-
-For bug reports and ideas, please open an issue.
+BurpMind is under active development. Watch the repo for new releases.
 
 ## Trademarks
 
@@ -151,5 +111,4 @@ Ollama is a trademark of Ollama, Inc.
 
 ## License
 
-License TBD. Until one is added, all rights are reserved by the author. If you'd
-like to use this in a project, please open an issue.
+Licensed under the [Apache License, Version 2.0](./LICENSE).
