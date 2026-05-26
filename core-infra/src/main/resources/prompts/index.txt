@@ -1,0 +1,2 @@
+# Bundled prompt manifest. One filename per line, relative to this directory.
+chat.default.yaml
