@@ -1,7 +1,9 @@
 plugins {
-    kotlin("jvm") version "2.0.21" apply false
-    kotlin("plugin.serialization") version "2.0.21" apply false
-    id("com.github.johnrengelman.shadow") version "8.1.1" apply false
+    kotlin("jvm") version "2.1.21" apply false
+    kotlin("plugin.serialization") version "2.1.21" apply false
+    // The original johnrengelman/shadow plugin was abandoned and doesn't run
+    // on Gradle 9+. com.gradleup.shadow is the maintained drop-in successor.
+    id("com.gradleup.shadow") version "9.4.1" apply false
 }
 
 allprojects {
