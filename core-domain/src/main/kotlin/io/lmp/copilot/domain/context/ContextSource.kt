@@ -46,5 +46,5 @@ data class ContextItem(
     val rawBytes: String? = null,
     val metadata: Map<String, String> = emptyMap(),
 ) {
-    enum class Kind { HttpRequest, HttpResponse, Note, File, SiteMapSummary, Other }
+    enum class Kind { HttpRequest, HttpResponse, WebSocketMessage, Note, File, SiteMapSummary, Other }
 }

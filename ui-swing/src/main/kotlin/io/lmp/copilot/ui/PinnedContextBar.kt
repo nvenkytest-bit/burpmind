@@ -73,6 +73,7 @@ class PinnedContextBar(
     private fun kindIcon(item: ContextItem): String = when (item.kind) {
         ContextItem.Kind.HttpRequest -> "→"
         ContextItem.Kind.HttpResponse -> "←"
+        ContextItem.Kind.WebSocketMessage -> "⇄"
         ContextItem.Kind.Note -> "✎"
         ContextItem.Kind.File -> "📄"
         ContextItem.Kind.SiteMapSummary -> "≡"
