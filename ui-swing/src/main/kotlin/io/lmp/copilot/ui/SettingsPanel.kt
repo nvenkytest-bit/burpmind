@@ -22,6 +22,8 @@ import javax.swing.JComboBox
 import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.JTextField
+import java.awt.event.FocusAdapter
+import java.awt.event.FocusEvent
 
 /**
  * Phase 1 settings: Ollama URL, model picker, and "Test connection".
@@ -59,15 +61,43 @@ class SettingsPanel(
         addButtonsRow(row++)
         addFillerRow(row)
 
-        testButton.addActionListener { runHealthCheck() }
-        refreshModelsButton.addActionListener { refreshModels() }
-        urlField.addActionListener { saveAndRefresh() }
-        modelCombo.addActionListener {
-            val picked = (modelCombo.selectedItem as? String)?.trim().orEmpty()
-            if (picked.isNotEmpty() && picked != settings.defaultModel) {
-                settings.update { defaultModel = picked }
-                onModelPicked(picked)
+        // JTextField.addActionListener only fires on Enter. Users almost never
+        // press Enter after typing a URL — they click "Test connection" instead.
+        // Without a focus-loss commit, that click would test the previous URL.
+        urlField.addFocusListener(object : FocusAdapter() {
+            override fun focusLost(e: FocusEvent) {
+                commitUrlField()
             }
+        })
+        urlField.addActionListener { commitUrlField(); runHealthCheck() }
+
+        testButton.addActionListener {
+            // Defensive: re-read both fields right before we ping, in case the
+            // focus listener hasn't fired yet (e.g. accelerator key, or some
+            // platform L&Fs that don't fire focusLost on button click).
+            commitUrlField()
+            commitModelCombo()
+            runHealthCheck()
+        }
+        refreshModelsButton.addActionListener {
+            commitUrlField()
+            refreshModels()
+        }
+        modelCombo.addActionListener { commitModelCombo() }
+    }
+
+    private fun commitUrlField() {
+        val typed = urlField.text.trim()
+        if (typed.isNotEmpty() && typed != settings.ollamaBaseUrl) {
+            settings.update { ollamaBaseUrl = typed }
+        }
+    }
+
+    private fun commitModelCombo() {
+        val picked = (modelCombo.selectedItem as? String)?.trim().orEmpty()
+        if (picked.isNotEmpty() && picked != settings.defaultModel) {
+            settings.update { defaultModel = picked }
+            onModelPicked(picked)
         }
     }
 
@@ -117,12 +147,6 @@ class SettingsPanel(
             fill = GridBagConstraints.BOTH
         }
         add(Box.createGlue(), g)
-    }
-
-    private fun saveAndRefresh() {
-        val newUrl = urlField.text.trim().ifEmpty { settings.ollamaBaseUrl }
-        settings.update { ollamaBaseUrl = newUrl }
-        runHealthCheck()
     }
 
     private fun runHealthCheck() {
